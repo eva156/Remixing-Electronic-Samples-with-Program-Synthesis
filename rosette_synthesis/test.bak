@@ -1,0 +1,23 @@
+#lang rosette
+
+(require rosette/lib/synthax)
+(require rosette/lib/angelic)
+
+(define (bvmul2_?? x)
+  (bvshl x (?? (bitvector 8))))
+
+(bvmul2_?? (bv 1 8))
+
+(define-symbolic x (bitvector 8))
+(bvmul2_?? x)
+
+(equal? (bvmul2_?? x)(bvmul2_?? x))
+
+(define sol
+  (synthesize
+   #:forall (list x)
+   #:guarantee (assert (equal? (bvmul2_?? x)(bvmul x (bv 2 8))))))
+
+sol
+
+(print-forms sol)

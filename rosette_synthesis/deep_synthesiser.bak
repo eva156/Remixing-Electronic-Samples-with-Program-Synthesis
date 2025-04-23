@@ -1,0 +1,118 @@
+#lang rosette
+
+(require rosette/lib/synthax)
+
+(define int32? (bitvector 32))
+
+(define (int32 i)
+  (bv i int32?))
+
+(define (bveven? y)
+  (bveq (bvand y (int32 1)) (int32 0))
+  )
+
+(define (bvodd? y)
+  (bveq (bvand y (int32 1)) (int32 1))
+  )
+
+(define (bvdiv4? y)
+  (bveq (bvand y (int32 3)) (int32 0))
+  )
+
+(define (bvdiv8? y)
+  (bveq (bvand y (int32 7)) (int32 0))
+  )
+
+(define (bvdiv? n m)
+  (if (bveven? m)
+      (bveq (bvand n (bvsub m (int32 1))) (int32 0))
+      (bveq (bvsmod n m) (int32 0))
+      )
+  )
+
+(define (bvmodfaster n m)
+  (if (bveq (bvand m (bvsub1 m)) (int32 0))
+      (bvand n m)
+      (bvsmod n m)
+      )
+  )
+
+(define-grammar (beat-mapper2 x)
+  [expr
+   (choose x (?? int32?)
+           ((bop) (expr) (expr))
+           ((uop) (expr)))]
+  [bop
+   (choose bvadd bvsub bvmul bvsle bvsge bveq)]
+  [uop
+   (choose bvneg bveven? bvodd? bvdiv4? bvdiv8? bvnot bvzero? bvadd1 bvsub1)]
+  )
+
+(define-grammar (beat-cmp x)
+  [cmp
+   (choose
+    #t #f (int32 0) (int32 1)
+    ((op) (beat-mapper2 x) (beat-mapper2 x))
+    ((oneop) (beat-mapper2 x))
+    (and (cmp) (cmp))
+    (or (cmp) (cmp))
+    (not (cmp)))]
+  [op
+   (choose
+    bvslt bvsle bvsgt bvsge bveq)]
+  [oneop
+   (choose
+    bvnot bvzero? bveven? bvodd? bvdiv4? bvdiv8?)]
+  )
+
+(define-grammar (beat-if x)
+  [term
+   (choose x (beat-mapper2 x)
+           (if (beat-cmp x) (term) (term)))]
+  )
+
+(define (beatmapper-fun x)
+  (assume (bvsge x (int32 0)))
+  (assume (bvsle x (int32 47)))
+  (beat-if x))
+
+
+(bvsrem (int32 46) (int32 4))
+
+(define (beatmapper-spec candidate)
+  (assert (<=> (not (candidate x)) (bvdiv4? (bvadd x (int32 3))))
+  )
+  )
+
+(define (beat-spec candidate)
+  (assert (equal? '((candidate 1) (candidate 3) (candidate 5))
+                  (filter (map candidate (range 6)))))
+  )
+
+(define expected '(#f #t #f  #t #f #f #f #t #f #f #f #t #f #f #f #t #f #f #f #t))
+
+(filter (lambda (y) y) expected)
+
+(define (candidate-results candidate)
+  (map candidate (range (length expected))))
+
+;;(candidate-results beatmapper-fun)
+
+(current-grammar-depth 3)
+(define-symbolic x int32?)
+
+;;(current-bitwidth 16)
+
+(define sol
+  (synthesize
+   #:forall (list x)
+   #:guarantee (assert (beatmapper-spec beatmapper-fun))
+  )
+ )
+
+;;(assert (equal? (candidate-results beatmapper-fun) expected))
+sol
+
+(print-forms sol)
+
+;;(generate-forms sol)

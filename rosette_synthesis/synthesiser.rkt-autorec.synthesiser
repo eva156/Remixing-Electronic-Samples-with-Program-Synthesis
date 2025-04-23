@@ -1,0 +1,74 @@
+#lang rosette
+
+(require rosette/lib/synthax)
+
+(define-grammar (beat-mapper2 x)
+  [expr
+   (choose x (?? integer?)
+           (?? boolean?)
+           ((bop) (expr) (expr))
+           ((uop) (expr)))]
+  [bop
+   (choose modulo quotient + - * = < >= && ||)]
+  [uop
+   (choose even? odd? add1 sub1 not zero? positive? negative?)]
+  )
+
+(define-grammar (beat-cmp x)
+  [cmp
+   (choose
+    x
+    (?? boolean?)
+    ((op) (beat-mapper2 x) (beat-mapper2 x))
+    ((oneop) (beat-mapper2 x))
+    (and (cmp) (cmp))
+    (or (cmp) (cmp))
+    (not (cmp)))]
+  [op
+   (choose
+    < <= > >= && || =)]
+  [oneop
+   (choose
+    not even? odd? zero? positive? negative?)]
+  )
+
+(define-grammar (beat-if x)
+  [term
+   (choose (beat-mapper2 x)
+           (if (beat-cmp x) (term) (term)))]
+  )
+
+(define (beatmapper-fun x)
+  (beat-if x))
+
+(define (beatmapper-spec candidate)
+  (assert (candidate 0))
+  (assert (not (candidate 1)))
+  (assert (candidate 2))
+  (assert (candidate 3))
+  (assert (candidate 4))
+  (assert (candidate 5))
+  (assert (candidate 6))
+  (assert (not (candidate 7)))
+  (assert (candidate 8))
+  )
+
+(define expected (list false true false true false))
+(define candidate-results (map beatmapper-fun (range (length expected))))
+
+
+
+(current-grammar-depth 2)
+(define-symbolic x integer?)
+
+(current-bitwidth 16)
+
+(define sol
+  (synthesize
+   #:forall (list x)
+   #:guarantee (assert equal?(candidate-results expected))
+   ))
+
+sol
+
+(print-forms sol)

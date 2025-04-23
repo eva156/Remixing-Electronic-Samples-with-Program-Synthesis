@@ -6,8 +6,9 @@ QLabel {{
 }}
 QPushButton {{
     font-size: 24px;
-    background-color: {QTMATERIAL_PRIMARYLIGHTCOLOR};
-    color: {QTMATERIAL_PRIMARYTEXTCOLOR};
+    background-color: {QTMATERIAL_SECONDARYDARKCOLOR};
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    border-color: {QTMATERIAL_SECONDARYCOLOR};
 }}
 QTextEdit {{
     font-size: 22px;
@@ -71,22 +72,22 @@ QRect{{
 }}
 
 .heading {{
-    font-size: 30px;
-    color: {QTMATERIAL_PRIMARYCOLOR};
+    font-size: 26px;
+    color: {QTMATERIAL_PRIMARYLIGHTCOLOR};
     background-color: {QTMATERIAL_SECONDARYCOLOR};
 }}
 
 .littleHeading {{
     font-size: 23px;
     color: {QTMATERIAL_PRIMARYLIGHTCOLOR};
-    background-color: {QTMATERIAL_SECONDARYCOLOR};
+    background-color: {QTMATERIAL_SECONDARYDARKCOLOR};
 }}
 .showText {{
-    background-color: {QTMATERIAL_SECONDARYCOLOR};
+    background-color: {QTMATERIAL_SECONDARYDARKCOLOR};
 }}
 .editHeading {{
     font-size: 23px;
-    background-color: {QTMATERIAL_SECONDARYCOLOR};
+    background-color: {QTMATERIAL_SECONDARYDARKCOLOR};
 }}
 
 .warning {{
@@ -102,5 +103,17 @@ QRect{{
     font-size: 18px;
     background-color: {QTMATERIAL_SECONDARYCOLOR};
     color: {QTMATERIAL_PRIMARYLIGHTCOLOR};
+    border-color: {QTMATERIAL_SECONDARYCOLOR};
+}}
+
+.clickedButton {{
+    font-size: 18px;
+    background-color: {QTMATERIAL_PRIMARYCOLOR};
+    color: {QTMATERIAL_PRIMARYTEXTCOLOR};
+    border-color: {QTMATERIAL_SECONDARYCOLOR};
+}}
+
+.audioButton {{
+    background-color: {QTMATERIAL_PRIMARYCOLOR};
     border-color: {QTMATERIAL_SECONDARYCOLOR};
 }}
